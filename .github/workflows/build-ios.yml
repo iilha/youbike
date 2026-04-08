@@ -1,0 +1,64 @@
+name: Build iOS
+
+on:
+  push:
+    branches: [main, gh-pages]
+    paths:
+      - 'ios/**'
+      - 'index.html'
+      - 'js/**'
+      - 'sw.js'
+      - '.github/workflows/build-ios.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Sync web assets into iOS project
+        run: ./ios/sync-web.sh
+
+      - name: Select Xcode
+        run: |
+          XCODE_PATH=$(ls -d /Applications/Xcode*.app 2>/dev/null | sort -V | tail -1)
+          echo "Using: $XCODE_PATH"
+          sudo xcode-select -s "$XCODE_PATH/Contents/Developer"
+          xcodebuild -version
+
+      - name: Build for iOS Simulator
+        working-directory: ios/Youbike
+        run: |
+          xcodebuild \
+            -project Youbike.xcodeproj \
+            -scheme Youbike \
+            -destination 'generic/platform=iOS Simulator' \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_ALLOWED=NO \
+            build \
+            | tail -20
+
+      - name: Archive for distribution
+        working-directory: ios/Youbike
+        run: |
+          xcodebuild \
+            -project Youbike.xcodeproj \
+            -scheme Youbike \
+            -destination 'generic/platform=iOS' \
+            -configuration Release \
+            -archivePath "$RUNNER_TEMP/Youbike.xcarchive" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_ALLOWED=NO \
+            archive \
+            | tail -20
+
+      - name: Upload Xcode archive
+        uses: actions/upload-artifact@v5
+        with:
+          name: youbike-ios-archive
+          path: ${{ runner.temp }}/Youbike.xcarchive
+          retention-days: 90

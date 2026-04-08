@@ -37,10 +37,7 @@ struct WebViewScreen: UIViewRepresentable {
             if let url = navigationAction.request.url {
                 if url.isFileURL { decisionHandler(.allow); return }
                 let host = url.host ?? ""
-                let allowedHosts = ["tile.openstreetmap.org", "unpkg.com", "apis.youbike.com.tw",
-                    "tdx.transportdata.tw", "earthquake.usgs.gov", "api.open-meteo.com",
-                    "geocoding-api.open-meteo.com", "overpass-api.de", "openapi.twse.com.tw",
-                    "owen-ouyang.workers.dev"]
+                let allowedHosts = ["tile.openstreetmap.org", "unpkg.com", "apis.youbike.com.tw"]
                 if allowedHosts.contains(where: { host.contains($0) }) {
                     decisionHandler(.allow); return
                 }

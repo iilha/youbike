@@ -70,7 +70,7 @@ const YOUBIKE_FARES = {
  * localStorage keys used across the app
  */
 const STORAGE_KEYS = {
-    LANG: 'ubike-lang',
+    LANG: 'youbike-lang',
     CITY: 'ubike-city',
     BUS_CITY: 'bus-city',
     MRT_SYSTEM: 'mrt-system',

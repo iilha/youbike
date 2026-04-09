@@ -4,7 +4,7 @@
 
 YouBike is a Progressive Web App (PWA) built with vanilla JavaScript, HTML5, and CSS3. The app displays real-time bike-sharing station data on an interactive Leaflet map with OpenStreetMap tiles. It functions as a static single-page application that can be:
 
-- Served via HTTP on GitHub Pages (https://oouyang.github.io/ubike/)
+- Served via HTTP on GitHub Pages (the project web server)
 - Loaded in Android WebView or iOS WKWebView for native app wrappers
 - Installed as a PWA via the Web App Manifest for offline use
 

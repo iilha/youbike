@@ -494,7 +494,7 @@ test.describe('YouBike PWA', () => {
 
     // Check localStorage
     const storedLang = await page.evaluate(() => {
-      return localStorage.getItem('ubike-lang');
+      return localStorage.getItem('youbike-lang');
     });
 
     expect(storedLang).toBeTruthy();

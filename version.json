@@ -1,0 +1,10 @@
+{
+  "otaVersionCode": 1,
+  "otaVersionName": "2026.05.05",
+  "minNativeVersionCode": 1,
+  "releaseNotes": {
+    "en": "Initial release with remote-first architecture",
+    "zh": "遠端優先架構初始版本"
+  },
+  "forceUpdate": false
+}

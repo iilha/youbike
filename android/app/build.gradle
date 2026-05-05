@@ -27,9 +27,13 @@ android {
 
     buildTypes {
         release {
+            buildConfigField "String", "WEB_ORIGIN", "\"https://youbike.transport-pwa.com/\"
             signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+        debug {
+            buildConfigField "String", "WEB_ORIGIN", "\"http://10.0.2.2:8080/\""
         }
     }
 
@@ -41,8 +45,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 

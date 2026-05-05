@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #475569;
+    }
+    .offline-container {
+      text-align: center;
+      padding: 32px;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #334155;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 24px;
+      color: #64748b;
+    }
+    button {
+      padding: 12px 24px;
+      background: #64748b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <h1>No Internet Connection</h1>
+    <p>Please check your network and try again.</p>
+    <button onclick="location.href='app://retry'">Retry</button>
+  </div>
+</body>
+</html>

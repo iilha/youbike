@@ -1,0 +1,9 @@
+{
+  "appId": "youbike",
+  "appName": "uyoubike  Monitor",
+  "apiBase": "https://api.transport-pwa.com/youbike",
+  "siteBase": "https://youbike.transport-pwa.com/",
+  "supportEmail": "transport-pwa@googlegroups.com",
+  "playStoreUrl": "https://play.google.com/store/apps/details?id=tw.pwa.youbike",
+  "storagePrefix": "youbike_"
+}

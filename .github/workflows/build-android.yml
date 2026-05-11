@@ -100,6 +100,12 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.name }}
           body: |
-            Android APK build from commit ${{ github.sha }}
-            Download the APK below and install on your Android device.
-          files: android/app/build/outputs/apk/debug/*.apk
+            Android build from commit ${{ github.sha }}
+
+            **Debug APK**: Development build for testing (debugging enabled)
+            **Release AAB**: For Play Store submission
+
+            Download the debug APK and install on your Android device.
+          files: |
+            android/app/build/outputs/apk/debug/*.apk
+            android/app/build/outputs/bundle/release/*.aab

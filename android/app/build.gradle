@@ -27,7 +27,7 @@ android {
 
     buildTypes {
         release {
-            buildConfigField "String", "WEB_ORIGIN", "\"https://youbike.transport-pwa.com/\"
+            buildConfigField "String", "WEB_ORIGIN", "\"https://youbike.transport-pwa.com/\""
             signingConfig signingConfigs.release.storeFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')

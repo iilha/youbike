@@ -1,7 +1,7 @@
 {
   "appId": "youbike",
   "appName": "uyoubike  Monitor",
-  "apiBase": "https://api.transport-pwa.com/youbike",
+  "apiBase": "https://app.octileapp.workers.dev",
   "siteBase": "https://youbike.transport-pwa.com/",
   "workerUrl": "https://api.octile.eu.cc",
   "eventsUrl": "https://api.octile.eu.cc/events",

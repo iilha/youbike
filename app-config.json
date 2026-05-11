@@ -9,7 +9,7 @@
     "events": true
   },
   "debug": false,
-  "supportEmail": "transport-pwa@googlegroups.com",
+  "supportEmail": "octile-pwa@googlegroups.com",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=tw.pwa.youbike",
   "storagePrefix": "youbike_"
 }

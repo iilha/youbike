@@ -1,15 +1,14 @@
 {
   "appId": "youbike",
   "appName": "uyoubike  Monitor",
-  "apiBase": "https://app.octileapp.workers.dev",
+  "apiBase": "https://api.octile.eu.cc",
   "siteBase": "https://youbike.transport-pwa.com/",
-  "workerUrl": "https://api.octile.eu.cc",
-  "eventsUrl": "https://api.octile.eu.cc/events",
   "features": {
     "events": true
   },
   "debug": false,
   "supportEmail": "octile-pwa@googlegroups.com",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=tw.pwa.youbike",
-  "storagePrefix": "youbike_"
+  "storagePrefix": "youbike_",
+  "turnstileSiteKey": "0x4AAAAAACuir272GuoMUfnx"
 }

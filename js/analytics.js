@@ -1,13 +1,15 @@
 /**
- * Minimal event tracking for transport PWAs (Fixed version)
+ * Minimal event tracking for transport PWAs (v1.5 - Session Token)
  * - Session events only (app_open)
  * - Offline queue with throttled flush (3.1s between sends)
  * - Size limits (2 KB)
  * - Client UUID only (no cookie reliance)
+ * - Session token authentication (lazy bootstrap)
  * - Debug logging
  */
 
 import { getBrowserUUID } from './uuid.js';
+import { ensureSession, clearSession } from './session.js';
 
 const QUEUE_KEY = '{app_id}_event_queue';
 const MAX_QUEUE_SIZE = 50;
@@ -29,6 +31,12 @@ export function initAnalytics(config) {
     return;
   }
 
+  // Runtime safety: warn if devMode is enabled in production
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  if (!isLocalhost && config.devMode === true) {
+    console.warn('[Analytics] ⚠️  devMode is true in production origin - events will not be sent');
+  }
+
   window.addEventListener('online', flushEventQueue);
   _log('Analytics initialized', { appId: config.appId });
 }
@@ -44,12 +52,16 @@ export async function trackEvent(eventName, eventProps = {}) {
   }
   _lastEventTime = now;
 
+  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
   const event = {
     event_type: 'session',
     event_name: eventName,
     app_id: _config.appId,
     browser_uuid: getBrowserUUID(),  // Client UUID always
     platform: _getPlatform(),
+    env: isLocalhost || _config.devMode ? 'dev' : 'prod',
+    origin: window.location.origin,
     event_props: _sanitizeProps(eventProps),
     timestamp_utc: new Date().toISOString(),
     submission_id: crypto.randomUUID()
@@ -60,6 +72,12 @@ export async function trackEvent(eventName, eventProps = {}) {
   if (eventBytes > EVENT_SIZE_LIMIT) {
     _log('Event too large, truncating', { bytes: eventBytes });
     event.event_props = { error: 'props_truncated' };
+  }
+
+  // Dev mode: log but don't send (production API requires worker signature)
+  if (_config.devMode) {
+    _log('Dev mode: Event created (not sent)', event);
+    return;
   }
 
   if (!navigator.onLine) {
@@ -78,24 +96,65 @@ export async function trackEvent(eventName, eventProps = {}) {
 }
 
 async function _sendEvent(event) {
-  const url = _config.eventsUrl || (_config.workerUrl + '/events');
+  const url = _config.apiBase + '/events';
+
+  // Get session token (fast if cached ~50ms; bootstrap if needed ~2s)
+  let sessionToken = null;
+  try {
+    sessionToken = await ensureSession();
+  } catch (err) {
+    _log('Failed to get session token:', err);
+    // Continue anyway - web with Origin might not need it
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 8000);
 
   try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Player-UUID': event.browser_uuid
+    };
+
+    // Add session token if available (preferred over Turnstile)
+    if (sessionToken) {
+      headers['X-Session-Token'] = sessionToken;
+    }
+
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Player-UUID': event.browser_uuid
-      },
+      headers,
       body: JSON.stringify(event),
-      credentials: 'include',  // Harmless (cookies not used for identity)
       signal: controller.signal
     });
 
     clearTimeout(timeout);
+
+    // If 401 (expired/invalid token), clear cache and immediate retry
+    if (response.status === 401 && sessionToken) {
+      _log('Session token rejected, clearing cache and retrying...');
+      clearSession();
+
+      // Immediate retry with new session (don't wait for next event)
+      try {
+        const newToken = await ensureSession();
+        if (newToken) {
+          headers['X-Session-Token'] = newToken;
+          const retryResponse = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(event),
+            signal: controller.signal
+          });
+          if (retryResponse.ok) {
+            _log('Retry succeeded with new session token');
+            return await retryResponse.json();
+          }
+        }
+      } catch (retryErr) {
+        _log('Retry failed:', retryErr.message);
+      }
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);

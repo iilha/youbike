@@ -240,9 +240,10 @@ function updateSheetSummary() {
 // LANGUAGE
 // ============================================================
 
-function toggleLang() {
+async function toggleLang() {
   isZh = !isZh;
   saveLanguage(isZh ? 'zh' : 'en');
+  await applyLanguage(isZh ? 'zh' : 'en');
   updateUI();
   applyFilters();
   updatePopups();

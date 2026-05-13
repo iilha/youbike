@@ -2,7 +2,7 @@
   "appId": "youbike",
   "appName": "uyoubike  Monitor",
   "apiBase": "https://api.octile.eu.cc",
-  "siteBase": "https://youbike.transport-pwa.com/",
+  "siteBase": "https://iilha.github.io/youbike/",
   "features": {
     "events": true
   },

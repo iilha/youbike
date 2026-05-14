@@ -1,5 +1,7 @@
 'use strict';
 
+import { showToast } from './toast.js';
+
 /**
  * YouBike Unified Page - Map & List Views
  * Uses YOUBIKE_API, CITIES, normalizeStation, getMarkerType from common.js
@@ -1594,7 +1596,7 @@ async function sendFeedback() {
     const lang = localStorage.getItem('lang') || 'en';
 
     if (!feedbackText) {
-      alert(lang === 'zh' ? '請輸入您的意見回饋' : 'Please enter your feedback');
+      showToast(lang === 'zh' ? '請輸入您的意見回饋' : 'Please enter your feedback', 'info');
       return;
     }
 
@@ -1657,12 +1659,12 @@ async function sendFeedback() {
     // Success
     document.getElementById('feedback-text').value = '';
     document.getElementById('feedback-email').value = '';
-    alert(lang === 'zh' ? '感謝您的回饋！' : 'Thanks for your feedback!');
+    showToast(lang === 'zh' ? '感謝您的回饋！' : 'Thanks for your feedback!', 'success');
     closeFeedbackModal();
   } catch (error) {
     console.error('Feedback error:', error);
     const lang = localStorage.getItem('lang') || 'en';
-    alert(lang === 'zh' ? '發送失敗，請稍後再試' : 'Failed to send. Please try again later.');
+    showToast(lang === 'zh' ? '發送失敗，請稍後再試' : 'Failed to send. Please try again later.', 'error');
   } finally {
     window.__feedbackSubmitting = false;
     const sendBtn = document.querySelector('.feedback-submit');

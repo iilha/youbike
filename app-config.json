@@ -7,7 +7,7 @@
     "events": true
   },
   "debug": false,
-  "supportEmail": "octile-pwa@googlegroups.com",
+  "supportEmail": "octile-pwa+youbike@googlegroups.com",
   "playStoreUrl": "https://play.google.com/store/apps/details?id=tw.pwa.youbike",
   "storagePrefix": "youbike_",
   "turnstileSiteKey": "0x4AAAAAACuir272GuoMUfnx"

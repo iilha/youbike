@@ -1089,6 +1089,68 @@
     </div>
   </div>
 
+  <!-- About Modal -->
+  <div class="modal" id="about-modal">
+    <div class="modal-content">
+      <h2 data-i18n="about.title">About</h2>
+      <div class="about-body">
+        <p class="about-app-name" data-i18n="about.name">App Name</p>
+        <p class="about-version">
+          <span data-i18n="about.version">Version</span>
+          <span id="app-version-display">1.0.0</span>
+        </p>
+        <p class="about-byline" data-i18n="about.byline">A Taiwan Transport PWA</p>
+        <div class="about-links">
+          <a id="about-contact-email" href="mailto:octile-pwa+youbike@googlegroups.com" class="about-link">
+            <span data-i18n="about.contact">Contact</span>
+          </a>
+          <a href="privacy.html" target="_blank" class="about-link">
+            <span data-i18n="about.privacy">Privacy Policy</span>
+          </a>
+        </div>
+      </div>
+      <button class="modal-done" onclick="closeAboutModal()" data-i18n="about.done">Done</button>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div class="modal" id="help-modal">
+    <div class="modal-content">
+      <h2 data-i18n="help.title">How to Use</h2>
+      <div class="help-body">
+        <p data-i18n="help.intro">App description</p>
+        <h3 data-i18n="help.features">Features</h3>
+        <ul class="help-list">
+          <li data-i18n="help.feature1">Feature 1</li>
+          <li data-i18n="help.feature2">Feature 2</li>
+          <li data-i18n="help.feature3">Feature 3</li>
+          <li data-i18n="help.feature4">Feature 4</li>
+        </ul>
+      </div>
+      <p class="help-contact">
+        <span data-i18n="help.contact">Contact: </span>
+        <a id="help-contact-email" href="mailto:octile-pwa+youbike@googlegroups.com">octile-pwa+youbike@googlegroups.com</a>
+      </p>
+      <button class="modal-done" onclick="closeHelpModal()" data-i18n="help.done">Got it</button>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div class="modal" id="feedback-modal">
+    <div class="modal-content">
+      <h2 data-i18n="feedback.title">Feedback</h2>
+      <p class="feedback-intro" data-i18n="feedback.intro">Help us improve this app</p>
+      <textarea id="feedback-text" class="feedback-textarea" rows="6"
+        data-i18n-placeholder="feedback.placeholder"></textarea>
+      <input type="email" id="feedback-email" class="feedback-email-input"
+        data-i18n-placeholder="feedback.emailPlaceholder">
+      <div class="feedback-actions">
+        <button class="modal-done feedback-submit" onclick="sendFeedbackEmail()" data-i18n="feedback.send">Send</button>
+        <button class="modal-cancel" onclick="closeFeedbackModal()" data-i18n="feedback.cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/common.js"></script>
   <script src="js/bottom-sheet.js"></script>
   <script src="js/ubike.js"></script>

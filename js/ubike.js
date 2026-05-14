@@ -1423,6 +1423,16 @@ function showLoading(show) {
 async function init() {
   console.log('[UBike] Initializing...');
 
+  // Load app config and store globally
+  try {
+    const configResp = await fetch('./app-config.json');
+    const config = await configResp.json();
+    window.__APP_CONFIG__ = config;
+    console.log('[UBike] Config loaded:', config.appId);
+  } catch (err) {
+    console.warn('[UBike] Failed to load app-config.json:', err);
+  }
+
   // Restore saved language
   const savedLang = localStorage.getItem(STORAGE_KEYS.LANG);
   if (savedLang) {
@@ -1521,6 +1531,177 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Help/About/Feedback modal functions
+async function openHelpModal() {
+  // Load support email from app-config.json
+  try {
+    const configResp = await fetch('./app-config.json');
+    const config = await configResp.json();
+    const emailLink = document.getElementById('help-contact-email');
+    if (emailLink && config.supportEmail) {
+      emailLink.href = `mailto:${config.supportEmail}`;
+      emailLink.textContent = config.supportEmail;
+    }
+  } catch (err) {
+    console.warn('Failed to load support email from config:', err);
+  }
+  document.getElementById('help-modal').classList.add('open');
+}
+
+function closeHelpModal() {
+  document.getElementById('help-modal').classList.remove('open');
+}
+
+async function openAboutModal() {
+  const version = document.getElementById('app-version')?.textContent || '1.0.0';
+  document.getElementById('app-version-display').textContent = version;
+
+  // Load support email from app-config.json
+  try {
+    const configResp = await fetch('./app-config.json');
+    const config = await configResp.json();
+    const emailLink = document.getElementById('about-contact-email');
+    if (emailLink && config.supportEmail) {
+      emailLink.href = `mailto:${config.supportEmail}`;
+    }
+  } catch (err) {
+    console.warn('Failed to load support email from config:', err);
+  }
+
+  document.getElementById('about-modal').classList.add('open');
+}
+
+function closeAboutModal() {
+  document.getElementById('about-modal').classList.remove('open');
+}
+
+function openFeedbackModal() {
+  document.getElementById('feedback-modal').classList.add('open');
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedback-modal').classList.remove('open');
+}
+
+async function sendFeedback() {
+  // Rate limit / double-click protection
+  if (window.__feedbackSubmitting) return;
+  window.__feedbackSubmitting = true;
+
+  try {
+    const feedbackText = document.getElementById('feedback-text')?.value.trim();
+    const feedbackEmail = document.getElementById('feedback-email')?.value.trim();
+    const lang = localStorage.getItem('lang') || 'en';
+
+    if (!feedbackText) {
+      alert(lang === 'zh' ? '請輸入您的意見回饋' : 'Please enter your feedback');
+      return;
+    }
+
+    // Disable button (with null check)
+    const sendBtn = document.querySelector('.feedback-submit');
+    if (sendBtn) {
+      sendBtn.disabled = true;
+      sendBtn.textContent = lang === 'zh' ? '傳送中...' : 'Sending...';
+    }
+
+    // Use pre-loaded config (not fetch every time)
+    const config = window.__APP_CONFIG__;
+    if (!config) throw new Error('Config not loaded');
+
+    const nativeVersion = window.__APP_ENV__?.nativeVersionName || '1.0.0';
+    const platform = window.__APP_ENV__?.platform || 'web';
+
+    // Generate UUID if not exists (not "unknown")
+    let uuid = localStorage.getItem(`${config.storagePrefix}browser_uuid`);
+    if (!uuid) {
+      uuid = crypto.randomUUID ? crypto.randomUUID() : generateUUID();
+      localStorage.setItem(`${config.storagePrefix}browser_uuid`, uuid);
+    }
+
+    // Unified context schema (same for all apps)
+    const context = {
+      app: config.appId,
+      screen: {
+        w: window.innerWidth,
+        h: window.innerHeight,
+        dpr: window.devicePixelRatio || 1
+      },
+      locale: lang,
+      city: document.getElementById('city-select')?.value || null,
+      tab: document.querySelector('.tab-btn.active')?.dataset.tab || null,
+      view: null,
+      query: null
+    };
+
+    const response = await fetch(`${config.apiBase}/feedback`, {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: 'general',
+        email: feedbackEmail || null,
+        message: feedbackText,
+        lang: lang,
+        version: nativeVersion,
+        platform: platform,
+        uuid: uuid,
+        context: context
+      })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    // Success
+    document.getElementById('feedback-text').value = '';
+    document.getElementById('feedback-email').value = '';
+    alert(lang === 'zh' ? '感謝您的回饋！' : 'Thanks for your feedback!');
+    closeFeedbackModal();
+  } catch (error) {
+    console.error('Feedback error:', error);
+    const lang = localStorage.getItem('lang') || 'en';
+    alert(lang === 'zh' ? '發送失敗，請稍後再試' : 'Failed to send. Please try again later.');
+  } finally {
+    window.__feedbackSubmitting = false;
+    const sendBtn = document.querySelector('.feedback-submit');
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      const lang = localStorage.getItem('lang') || 'en';
+      sendBtn.textContent = lang === 'zh' ? '傳送' : 'Send';
+    }
+  }
+}
+
+// Backward compatibility alias
+function sendFeedbackEmail() {
+  sendFeedback();
+}
+
+// Utility: Generate UUID (fallback for crypto.randomUUID)
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+}
+
+// Modal backdrop click handlers
+['help-modal', 'about-modal', 'feedback-modal'].forEach(id => {
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        if (id === 'help-modal') closeHelpModal();
+        if (id === 'about-modal') closeAboutModal();
+        if (id === 'feedback-modal') closeFeedbackModal();
+      }
+    });
+  }
+});
+
 // Make functions available globally for onclick handlers
 window.toggleLang = toggleLang;
 window.changeCity = changeCity;
@@ -1536,3 +1717,10 @@ window.reportViaForm = reportViaForm;
 window.reportViaAutoFill = reportViaAutoFill;
 window.reportViaCall = reportViaCall;
 window.reportViaEmail = reportViaEmail;
+window.openHelpModal = openHelpModal;
+window.closeHelpModal = closeHelpModal;
+window.openAboutModal = openAboutModal;
+window.closeAboutModal = closeAboutModal;
+window.openFeedbackModal = openFeedbackModal;
+window.closeFeedbackModal = closeFeedbackModal;
+window.sendFeedbackEmail = sendFeedbackEmail;
